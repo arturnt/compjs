@@ -71,7 +71,7 @@ without any proxying sillyness.
 Now let's make these tabs load content dynamically:
 
 <script>
-	Comp.TabsAjax = this.TabsInline.extend({
+	Comp.TabsAjax = Comp.TabsInline.extend({
 		pick: function(panel, target) {		
 			panel.load(target.attr("src"));
 		}
