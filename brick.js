@@ -22,13 +22,15 @@
 			prototype[name] = typeof prop[name] == "function"
 					&& typeof _super[name] == "function"
 					&& fnTest.test(prop[name]) ? (function(name, fn) {
-				return function() {
+				var wrapped = function() {
 					var tmp = this._super;
 					this._super = _super[name];
 					var ret = fn.apply(this, arguments);
 					this._super = tmp;
 					return ret;
 				};
+                               wrapped._original = fn;
+                               return wrapped;
 			})(name, prop[name]) : prop[name];
 		}
 
@@ -84,9 +86,7 @@
 		if (str == null) {
 			return $(this).find("[sub]");
 		} else {
-			return $(this).find(
-					"[sub='" + (str.charAt(0) == '$' ? str.substring(1) : str)
-							+ "']");
+			return $(this).find("[sub='" + (str.charAt(0) == '$' ? str.substring(1) : str) + "']");
 		}
 	}
 
@@ -102,7 +102,7 @@
 	 * @param (Comp) me inherited-object instance to call 'fn' with.
 	 * @returns (Function) which will auto-bind $ variables.
 	 */
-	$.paramBinder = function(fn, me) {
+	$.paramBinder = function(fn, me, method) {
 		/** Borrowed from Prototype library **/
 		function argumentNames(fn) {
 			var names = fn.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
@@ -112,13 +112,9 @@
 		}
 
 		return function() {
-			var names = argumentNames(fn);
-			var original = [];
+			var names = argumentNames(fn._original? fn._original : fn);
+			var original = Array.prototype.slice.call(arguments);
 			var newones = [];
-
-			for ( var i = 0; i < arguments.length; i++) {
-				original.push(arguments[i]);
-			}
 
 			// Copy from the original to the new one. Will preserve argument order.
 			$.each(names, function(index, key) {
