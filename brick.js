@@ -170,8 +170,9 @@
 		if (proto == null)
 			return {};
 		
-		for ( var m in proto) 
-			methods[m] = proto[m];
+		for ( var name in proto ) 
+			if($.isFunction(proto[name]))
+				methods[name] = proto[name];
 
 		return $.extend(methods, getMethods(proto.__proto__));
 	}
@@ -203,7 +204,7 @@
 			
 			for ( var method in methods ) {
 				
-				if (method != "_super" && method != "init" && $.isFunction(this[method])) {
+				if (method != "_super" && method != "init") {
 					
 					/**
 					 * Bind the method to be used many times below.
