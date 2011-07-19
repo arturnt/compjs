@@ -57,10 +57,9 @@
 	 * compobj plugin.
 	 */
 	$.fn.comp = function() {
-		return $("[comp]",this).each(function() {
+		return $("[data-comp]",this).each(function() {
 			var self = this;
-			
-			$.each($(this).attr("comp").split(","), function(key,value) {
+			$.each($(this).attr("data-comp").split(","), function(key,value) {
 				var value = $.trim(value);
 				if (Comp[value] && !$(self).compobj(value)) {
 					$(self).compobj(value, new Comp[value](self));
@@ -76,9 +75,9 @@
 	 */
 	$.fn.compobj = function(value, obj) {
 		if(obj) 
-			$(this).data("Comp." + value, obj);
+			$(this).data("$Comp." + value, obj);
 		else
-			return $(this).data("Comp." + value);
+			return $(this).data("$Comp." + value);
 	}
 
 	/**
@@ -88,10 +87,10 @@
 	 */
 	$.fn.compfind = function(/* String */ str) {
 		if (str == null) {
-			return $(this).find("[sub]");
+			return $(this).find("[data-sub]");
 		} else {
 			return $(this).find(
-					"[sub='" + (str.charAt(0) == '$' ? str.substring(1) : str)
+					"[data-sub='" + (str.charAt(0) == '$' ? str.substring(1) : str)
 							+ "']");
 		}
 	}
@@ -256,6 +255,14 @@
 			}
 		}
 	});
+	
+	this.Comp.namespace = function(/* String */ name, /* Object */ obj) {
+		if(Comp[name] === undefined) { Comp[name] = {}; }
+		$.each(obj, function(e) { 
+			Comp[name + "." + e] = obj[e];  
+			(Comp[name])[e] = obj[e];
+		});
+	}
 	
 	$(function() { $(this).comp();	});
 })(jQuery);
