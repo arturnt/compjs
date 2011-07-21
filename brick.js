@@ -36,10 +36,9 @@
 
 		// The dummy class constructor
 		function Class(e) {
-			if (!initializing) {
+			if (!initializing) 
 				if (this.init)
 					this.init.apply(this, arguments);
-			}
 		}
 
 		Class.prototype = prototype;
@@ -156,7 +155,7 @@
 
 	
 	/**
-	 * A safter corss browser way of getting the prototype of an object
+	 * A safer cross browser way of getting the prototype of an object
 	 * this is used below in get method.
 	 */
 	if (typeof Object.getPrototypeOf !== "function") {
