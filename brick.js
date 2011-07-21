@@ -36,9 +36,8 @@
 
 		// The dummy class constructor
 		function Class(e) {
-			if (!initializing) 
-				if (this.init)
-					this.init.apply(this, arguments);
+			if (!initializing && this.init) 
+				this.init.apply(this, arguments);
 		}
 
 		Class.prototype = prototype;
@@ -156,7 +155,7 @@
 	
 	/**
 	 * A safer cross browser way of getting the prototype of an object
-	 * this is used below in get method.
+	 * this is used below in get method. Taken from jresig's blog.
 	 */
 	if (typeof Object.getPrototypeOf !== "function") {
 		if (typeof "test".__proto__ === "object") {
@@ -165,7 +164,6 @@
 			};
 		} else {
 			Object.getPrototypeOf = function(object) {
-				// May break if the constructor has been tampered with
 				return object.constructor.prototype;
 			};
 		}
@@ -236,7 +234,7 @@
 					 * initializers or supers.
 					 */
 
-					for ( var method in methods) {
+					for ( var method in methods ) {
 
 						if (method != "_super" && method != "init") {
 
