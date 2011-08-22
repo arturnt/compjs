@@ -20,7 +20,7 @@
 		var prototype = new this(prop);
 		initializing = false;
 
-		for ( var name in prop) {
+		for ( var name in prop ) {
 			prototype[name] = typeof prop[name] == "function"
 					&& typeof _super[name] == "function"
 					&& fnTest.test(prop[name]) ? (function(name, fn) {
@@ -72,10 +72,12 @@
 	 * @returns (Comp) object bound to DOM element.
 	 */
 	$.fn.compobj = function(value, obj) {
+		
 		if (obj)
 			$(this).data("$Comp." + value, obj);
 		else
 			return $(this).data("$Comp." + value);
+		
 	}
 
 	/**
@@ -84,12 +86,20 @@
 	 * 
 	 * @returns (Array) of DOM elements
 	 */
-	$.fn.compfind = function(/* String */str) {
-		if (str == null) {
+	$.fn.compfind = function(/* String */ str) {
+	
+		if (str === null) {
 			return $(this).find("[data-sub]");
 		} else {
-			return $(this).find("[data-sub='" + (str.charAt(0) == '$' ? str.substring(1) : str) + "']");
+			var str = (str.charAt(0) == '$' ? str.substring(1) : str);
+			var comps = $(this).find("[data-sub='" + str + "']");
+			if(comps.length == 0) 
+				comps = $(this).find("." + str);
+			if(comps.length == 0) 
+				comps = $(this).find("#" + str);
+			return comps;
 		}
+		
 	}
 
 	/**
@@ -104,12 +114,12 @@
 	 * @param (Comp) me inherited-object instance to call 'fn' with.
 	 * @returns (Function) which will auto-bind $ variables.
 	 */
-	$.paramBinder = function(/* Function */fn, /* Object */me) {
+	$.paramBinder = function(/* Function */ fn, /* Object */ me) {
 
 		/**
 		 * From Prototype JS
 		 */
-		function argumentNames( /* Function */fn) {
+		function argumentNames(/* Function */ fn) {
 			var names = fn.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
 					.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
 					.replace(/\s+/g, '').split(',');
@@ -123,11 +133,12 @@
 
 		return function() {
 
-			var ref = this;
-			var original = [], newones = [];
-			var names = argumentNames(fn);
+			var ref = this, 
+				original = [], 
+				newones = [],
+				names = argumentNames(fn);
 
-			for ( var i = 0; i < arguments.length; i++) {
+			for ( var i = 0; i < arguments.length; i++ ) {
 				original.push(arguments[i]);
 			}
 
@@ -136,19 +147,22 @@
 			 * argument order.
 			 */
 			$.each(names, function(index, key) {
-				if (key == "$this") {
+				
+				if ( key === "$this" ) 
 					newones.push($(ref));
-				} else if (key.charAt(0) == "$") {
+				else if ( key.charAt(0) === "$" ) 
 					newones.push(me.element.compfind(key));
-				} else {
+				else
 					newones.push(original.shift());
-				}
+				
 			});
 
+			
 			return fn.apply(me, newones);
 		}
 	}
 })(jQuery);
+
 
 (function($) {
 
@@ -158,6 +172,7 @@
 	 * this is used below in get method. Taken from jresig's blog.
 	 */
 	if (typeof Object.getPrototypeOf !== "function") {
+		
 		if (typeof "test".__proto__ === "object") {
 			Object.getPrototypeOf = function(object) {
 				return object.__proto__;
@@ -167,6 +182,7 @@
 				return object.constructor.prototype;
 			};
 		}
+		
 	}
 
 	/**
@@ -180,14 +196,14 @@
 
 		var methods = {};
 
-		if (proto == null)
-			return {};
+		if ( proto == null )
+			return methods;
 
 		for ( var name in proto )
-			if ($.isFunction(proto[name]))
+			if ( $.isFunction(proto[name]) )
 				methods[name] = proto[name];
 
-		return $.extend(methods, arguments.callee(Object.getPrototypeOf(proto)));
+		return $.extend(methods, getMethods(proto.__proto__));
 		
 	}
 
@@ -201,109 +217,108 @@
 	 * @base Class
 	 */
 	this.Comp = Class.extend({
-				init : function( /* DOMElement */e) {
+		init : function( /* DOMElement */e) {
+
+			/**
+			 * Gather all the methods using introspection borrowed from
+			 * Prototype.js. Bind this.element to the element in
+			 * question.
+			 */
+			var methods = getMethods(this);
+			this.element = this.$ = $(e);
+			
+			/**
+			 * Get the data-attributes, which will populate the
+			 * configuration for this element.
+			 * 
+			 * To access DOM attribute use this._attr.{name} instead of
+			 * this.element.attr("data-{name}")
+			 */
+			this._attr = {}
+			if( e.attributes ) {
+				for ( var i = 0, attrs = e.attributes, len = attrs.length; i < len; i++) {
+					var name = attrs.item(i).nodeName,
+						postfix = name.replace(/data-/, "").toLowerCase();
+
+					if ( postfix !== name )
+						this._attr[postfix] = attrs.item(i).nodeValue;
+				}
+			}
+
+			/**
+			 * Iterate through the object properties. Check to make sure
+			 * that they are actual methods before proceeding, since we
+			 * are only binding functions. Also make sure we have no
+			 * initializers or supers.
+			 */
+
+			for ( var method in methods ) {
+
+				if ( method != "_super" && method != "init" ) {
 
 					/**
-					 * Gather all the methods using introspection borrowed from
-					 * Prototype.js. Bind this.element to the element in
-					 * question.
+					 * Bind the method to be used many times below.
 					 */
-					var methods = getMethods(this);
-					this.element = $(e);
-
+					var boundMethod = $.paramBinder(this[method], this);
+					this[method] = boundMethod;
+					
+					
 					/**
-					 * Get the data-attributes, which will populate the
-					 * configuration for this element.
-					 * 
-					 * To access DOM attribute use this._attr.{name} instead of
-					 * this.element.attr("data-{name}")
-					 */
-					this._attr = {}
-					for ( var i = 0, attrs = e.attributes, len = attrs.length; i < len; i++) {
-						var name = attrs.item(i).nodeName;
-						var postfix = name.replace(/data-/, "");
-
-						if (postfix !== name)
-							this._attr[postfix] = attrs.item(i).nodeValue;
-					}
-
-					/**
-					 * Iterate through the object properties. Check to make sure
-					 * that they are actual methods before proceeding, since we
-					 * are only binding functions. Also make sure we have no
-					 * initializers or supers.
+					 * Event Handler of type $[subname]_[event]
 					 */
 
-					for ( var method in methods ) {
+					if ( /_/.test(method) ) {
+						
+						var keys = method.split("_"),
+							fn = keys.pop(),
+							name = keys.pop();
 
-						if (method != "_super" && method != "init") {
+						if ("$" == name) 
+							this.element.bind(fn, boundMethod);
+						else 
+							this.element.compfind(name).live(fn, boundMethod);
 
-							/**
-							 * Bind the method to be used many times below.
-							 */
-							var boundMethod = $.paramBinder(this[method], this);
+					} else {
 
-							/**
-							 * Event Handler of type $[subname]_[event]
-							 */
+						/**
+						 * Event Handler of type "[css accessor]
+						 * [event]". an example of this would be "li
+						 * click": function($foo) { } to bind a click to
+						 * all LI elements. Helpful if you don't want to
+						 * 'sub' iterated elements.
+						 */
 
-							if (/_/.test(method)) {
-								var keys = method.split("_");
-								var fn = keys.pop();
-								var name = keys.pop();
+						if ( /\s/.test(method) ) {
 
-								if ("$" == name) {
-									this.element.bind(fn, boundMethod);
-								} else {
-									this.element.compfind(name).live(fn, boundMethod);
-								}
+							var tokens = method.split(" "),
+								fn = tokens.pop();
 
-							} else {
+							this.element.find(tokens.join(" ")).live( fn, boundMethod );
 
-								/**
-								 * Event Handler of type "[css accessor]
-								 * [event]". an example of this would be "li
-								 * click": function($foo) { } to bind a click to
-								 * all LI elements. Helpful if you don't want to
-								 * 'sub' iterated elements.
-								 */
-
-								if (/\s/.test(method)) {
-
-									var tokens = method.split(" ");
-									var fn = tokens.pop();
-
-									this.element.find(tokens.join(" ")).live(
-											fn, boundMethod);
-
-								} else {
-
-									/**
-									 * Looks like it's not a *event handler*,
-									 * but it's still a method in the class so
-									 * let's just bind it.
-									 */
-
-									this[method] = boundMethod;
-								}
-
-							}
 						}
+
 					}
 				}
-			});
+			}
+		}
+	});
 
-	this.Comp.namespace = function(/* String */name, /* Object */obj) {
-		if (Comp[name] === undefined) 
+	
+	this.Comp.namespace = function(/* String */ name, /* Object */ obj) {
+		
+		if ( Comp[name] === undefined ) 
 			Comp[name] = {};
 		
 		$.each(obj, function(e) {
 			Comp[name + "." + e] = obj[e];
 			(Comp[name])[e] = obj[e];
 		});
+		
 	}
+	
 
 	$(function() {
 		$(this).comp();
 	});
+	
 })(jQuery);
