@@ -273,7 +273,7 @@
 							fn = keys.pop(),
 							name = keys.pop();
 
-						if ("$" == name) 
+						if ( "$" === name ) 
 							this.element.bind(fn, boundMethod);
 						else 
 							this.element.compfind(name).live(fn, boundMethod);
