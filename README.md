@@ -44,7 +44,7 @@ the more commonly used components.
 ```
 ```html
 <script>
-	Comp.TabsInline = this.extend({
+	Comp.TabsInline = Comp.extend({
 		$tab_click: function(e, $panel, $tab) {
 			$tab.removeClass("selected");
 			this.pick($panel, $(e.target).addClass("selected"));
