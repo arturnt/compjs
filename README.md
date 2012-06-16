@@ -1,14 +1,15 @@
-======
-BrickJS
+
+##BrickJS
+
 Object Oriented Component Model for jQuery for writing consice yet powerful
 javascript components.
 
 author: Artur Rivilis
 blog: http://browntrout.wordpress.com
 license: GPL
-======
 
-SUMMARY
+
+###SUMMARY
 
 BrickJS is provided as a building block for javascript components. There are
 various problems that it tries to address that are existent in current uses of
@@ -39,6 +40,7 @@ EXAMPLES
 Best way to explain is with some examples. Let's start off with Tabs; one of
 the more commonly used components. 
 
+```html
 <div comp="TabsInline">
 	<ul>
 		<li sub="tab" text="Buz" href="/ajax/content1">
@@ -47,7 +49,8 @@ the more commonly used components.
 	</ul>
 	<div sub="panel"></div>
 </div>
-
+```
+```javascript
 <script>
 	Comp.TabsInline = this.extend({
 		$tab_click: function(e, $panel, $tab) {
@@ -61,6 +64,7 @@ the more commonly used components.
 
 	$("[comp]").comp();
 </script>
+```
 
 Here are some very basic Inline Tabs. The DOM elements identified as "tab" 
 are automatically bound to a click method. You can then also pass them into
@@ -70,6 +74,7 @@ without any proxying sillyness.
 
 Now let's make these tabs load content dynamically:
 
+```javascript
 <script>
 	Comp.TabsAjax = Comp.TabsInline.extend({
 		pick: function(panel, target) {		
@@ -77,6 +82,7 @@ Now let's make these tabs load content dynamically:
 		}
 	});
 </script>
+```
 
 Now if we replace TabsInline with TabsAjax in the markup we have Ajax Tabs.
 Due to the inheritence model, we don't have to write most of the functionality
