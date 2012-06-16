@@ -1,15 +1,9 @@
-
 ##BrickJS
 
 Object Oriented Component Model for jQuery for writing consice yet powerful
 javascript components.
 
-author: Artur Rivilis
-blog: http://browntrout.wordpress.com
-license: GPL
-
-
-###SUMMARY
+###Summary
 
 BrickJS is provided as a building block for javascript components. There are
 various problems that it tries to address that are existent in current uses of
@@ -33,9 +27,7 @@ of inheritence that comes with OOP.
 3. The framework has a very loose coupling to the DOM. All relations are 
 attribute drivens o the design can evolve independently of the functionality.
 
-======
-
-EXAMPLES
+###Examples
 
 Best way to explain is with some examples. Let's start off with Tabs; one of
 the more commonly used components. 
@@ -50,7 +42,7 @@ the more commonly used components.
 	<div sub="panel"></div>
 </div>
 ```
-```javascript
+```html
 <script>
 	Comp.TabsInline = this.extend({
 		$tab_click: function(e, $panel, $tab) {
@@ -74,7 +66,7 @@ without any proxying sillyness.
 
 Now let's make these tabs load content dynamically:
 
-```javascript
+```html
 <script>
 	Comp.TabsAjax = Comp.TabsInline.extend({
 		pick: function(panel, target) {		
@@ -90,3 +82,14 @@ just write what happens when a tab is chosen.
 
 This is just to get you started, using these simple building blocks you can write
 fairly complicated functionality in clean and simple code. Enjoy!
+
+### License
+
+The MIT License (MIT)
+Copyright (c) 2011 Artur Rivilis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
