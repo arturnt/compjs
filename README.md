@@ -1,7 +1,7 @@
-##BrickJS
+##CompJS
 
 Object Oriented Component Model for jQuery for writing consice yet powerful
-javascript components.
+Javascript components.
 
 ###Summary
 
